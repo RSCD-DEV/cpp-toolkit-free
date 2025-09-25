@@ -1,0 +1,45 @@
+{
+  "name": "cpp-toolkit",
+  "displayName": "Cpp Toolkit",
+  "description": "This extension contains several tools to support and improve your code. It will show you unused variable, unecessary includes and much more.",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.103.0"
+  },
+  "publisher": "RSCD",
+  "author": {
+    "name": "Robert Schneider"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://gitlab.com/rscd-dev/cpp-toolkit/cpp-toolkit-free"
+  },
+  "icon": "images/cpp_toolkit_icon.png",
+  "categories": [
+    "Linters",
+    "Other"
+  ],
+  "activationEvents": [
+    "onLanguage:cpp"
+  ],
+  "main": "./out/extension.js",
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.103.0",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "22.x",
+    "@typescript-eslint/eslint-plugin": "^8.42.0",
+    "@typescript-eslint/parser": "^8.42.0",
+    "eslint": "^9.34.0",
+    "typescript": "^5.9.2",
+    "@vscode/test-cli": "^0.0.11",
+    "@vscode/test-electron": "^2.5.2"
+  }
+}
