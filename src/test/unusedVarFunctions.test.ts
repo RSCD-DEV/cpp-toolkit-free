@@ -1,6 +1,7 @@
 import * as assert from 'assert';
-import { findPossibleDeclarations, findUnusedDeclarations, findRangesToOmit, Declaration } from '../unusedVarChecker/unusedVarFunctions';
 import * as vscode from 'vscode';
+import { findPossibleDeclarations, findUnusedDeclarations, Declaration } from '../unusedVarChecker/unusedVarFunctions';
+import { findRangesToOmit } from '../commonFunctions';
 
 async function createDocFromString(code: string): Promise<vscode.TextDocument> {
     const doc = await vscode.workspace.openTextDocument({
@@ -19,14 +20,14 @@ suite('UnusedVarFunctions Tests', () => {
             y = 5;
             auto assigned = 10;
             return returnValue;
-            
+
             // single comment;
-            // 
-            
+            //
+
             /* open multiline;
                 comment
             */
-           
+
            /** doxygen style;
             * comment
             */ `
@@ -52,7 +53,7 @@ suite('UnusedVarFunctions Tests', () => {
             return testVar;
 
             abc notUsed;
-            
+
             auto unusedVar;
             std::shared_ptr<UINT32> unusedPointer;
             return returnValue;`;

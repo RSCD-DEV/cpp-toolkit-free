@@ -1,10 +1,9 @@
-import * as vscode from 'vscode'
+import * as vscode from 'vscode';
+import { findRangesToOmit } from '../commonFunctions';
 
 export function findPossibleDeclarations(document: vscode.TextDocument, rangesToOmit: vscode.Range[]) {
-    console.log("search for declarations");
     const documentText = document.getText();
     var regExString = /(?<=^\s*)\b([\w:<>]+\s+(?:[\w:<>]+\s+)*)\s*(\w+)\s*(?:=[^;]*)?;/gmd;
-    // var regExString = /\b([\w:<>]+\s+(?:[\w:<>]+\s+)*)\s*(\w+)\s*(?:=[^;]*)?;/gmd;
     const regExDeclarations = RegExp(regExString);
     const possibleDeclarations = documentText.matchAll(regExDeclarations);
     let foundDeclarations: Declaration[] = [];
@@ -49,47 +48,7 @@ function findUsage(document: vscode.TextDocument, declarations: Declaration[], r
     return usages;
 }
 
-export function findRangesToOmit(document: vscode.TextDocument) {
-
-    function addRange(index: number, length: number) {
-        const start = document.positionAt(index);
-        const end = document.positionAt(index + length);
-
-        const range = new vscode.Range(start, end);
-        rangesToOmit.push(range);
-    }
-
-    function checkRegExAndAddRanges(regEx: RegExp) {
-        let foundMatches = documentText.matchAll(regEx);
-        for (const match of foundMatches) {
-            if (match.index) {
-                addRange(match.index, match[0].toString().length);
-            }
-        }
-    }
-
-    let rangesToOmit: vscode.Range[] = [];
-    const documentText = document.getText();
-
-    // Single Line Comments
-    const singleLineCommnetRegEx = /\/\/.*$/gmd;
-    checkRegExAndAddRanges(singleLineCommnetRegEx);
-
-    // Muliline Comments
-    const multilineCommentRegEx = /\/\*[\s\S]*?\*\//g;
-    checkRegExAndAddRanges(multilineCommentRegEx);
-
-    // Strings (C/C++-style, single line, handles escapes)
-    const cppStringRegex = /"((?:\\.|[^"\\\r\n])*)"|'((?:\\.|[^'\\\r\n])*)'/gd;
-
-
-
-    checkRegExAndAddRanges(cppStringRegex);
-
-    return rangesToOmit;
-}
-
-function cleanDeclarations(declarations: Declaration[], rangesToOmit: vscode.Range[]) {
+function cleanDeclarations(declarations: Declaration[], rangesToOmit: vscode.Range[]): Declaration[] {
     let cleanedDeclarations = declarations.filter(possibleDeclaration => possibleDeclaration.type !== 'return');
     cleanedDeclarations = cleanedDeclarations.filter(possibleDeclaration => !rangesToOmit.includes(possibleDeclaration.range));
     return cleanedDeclarations;
