@@ -1,5 +1,3 @@
-// See https://go.microsoft.com/fwlink/?LinkId=733558
-// for the documentation about the tasks.json format
 {
 	"version": "2.0.0",
 	"tasks": [
@@ -11,6 +9,57 @@
 			"presentation": {
 				"reveal": "never"
 			},
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			}
+		},
+		{
+			"label": "Build Extension",
+			"type": "shell",
+			"command": "npm run compile",
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"problemMatcher": "$tsc"
+		},
+		{
+			"label": "Test Extension",
+			"type": "shell",
+			"command": "npm test",
+			"group": "test",
+			"problemMatcher": []
+		},
+		{
+			"label": "Run Extension (VSCode)",
+			"type": "shell",
+			"command": "npm run watch && code --extensionDevelopmentPath=${workspaceFolder}",
+			"group": "none",
+			"problemMatcher": []
+		},
+		{
+			"label": "Package Extension",
+			"type": "shell",
+			"command": "vsce package",
+			"group": "build",
+			"problemMatcher": []
+		},
+		{
+			"label": "Install Locally",
+			"type": "shell",
+			"command": "code --install-extension cpp-toolkit-0.0.1.vsix",
+			"group": "none",
+			"problemMatcher": []
+		},
+		{
+			"label": "Build, Package & Install",
+			"dependsOn": [
+				"Build Extension",
+				"Package Extension",
+				"Install Locally"
+			],
+			"dependsOrder": "sequence",
 			"group": {
 				"kind": "build",
 				"isDefault": true
