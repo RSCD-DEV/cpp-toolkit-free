@@ -4,7 +4,7 @@ import { repoHeaderMaps } from "./unusedIncludeManager";
 
 function extractIncludedHeaderFiles(document: vscode.TextDocument): Array<[string, vscode.Range]> {
     const documentText = document.getText();
-    const includeRegex = /#include\s*["<](.*?)[">]/gd;
+    const includeRegex = /#include\s*"(.*?)"/gd;
     const foundIncludes = documentText.matchAll(includeRegex);
     const foundHeaders = new Array<[string, vscode.Range]>;
     for (const include of foundIncludes) {
@@ -74,8 +74,6 @@ export function findUnusedIncludes(document: vscode.TextDocument): Set<[string, 
 
     const includes = extractIncludedHeaderFiles(document);
 
-    console.log("found includes: ", includes);
-
     for (const include of includes) {
         const headerName = include[0];
         const headerRange = include[1];
@@ -85,7 +83,6 @@ export function findUnusedIncludes(document: vscode.TextDocument): Set<[string, 
         });
 
         if (headerPaths.length === 0) {
-
             console.log("header not found in headerMap", headerName);
             unusedHeaders.add([headerName, headerRange]);
             continue;

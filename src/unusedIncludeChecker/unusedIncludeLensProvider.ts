@@ -1,17 +1,20 @@
 import * as vscode from 'vscode';
 import { findUnusedIncludes } from './unusedIncludeFunctions';
+import { updateDiagnostics, clearDiagnostics } from '../diagnosticsManager';
 
 export class UnusedIncludeLensProvider implements vscode.CodeLensProvider {
+    private static readonly diagnosticsName = "unusedIncludes";
+    private static readonly diagnosticsMessage = "unusedIncludes";
+
     async provideCodeLenses(document: vscode.TextDocument): Promise<vscode.CodeLens[]> {
         const codeLenses: vscode.CodeLens[] = [];
-        console.log("Check for unused includes");
         const findings = findUnusedIncludes(document);
 
-        if (findings.size === 0) return codeLenses;
-
-        for (const finding of findings) {
-            const headerName = finding[0];
-            const headerRange = finding[1];
+        if (findings.size === 0) {
+            clearDiagnostics(UnusedIncludeLensProvider.diagnosticsName, document);
+            return codeLenses;
+        }
+        for (const [headerName, headerRange] of findings) {
             const line = headerRange.start.line;
             const lens = new vscode.CodeLens(headerRange, {
                 title: `Delete unused include: ${headerName}`,
@@ -20,6 +23,13 @@ export class UnusedIncludeLensProvider implements vscode.CodeLensProvider {
             });
             codeLenses.push(lens);
         }
+
+        updateDiagnostics(
+            UnusedIncludeLensProvider.diagnosticsName,
+            document,
+            findings,
+            UnusedIncludeLensProvider.diagnosticsMessage,
+            vscode.DiagnosticSeverity.Error);
 
         return codeLenses;
     }

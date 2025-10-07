@@ -1,7 +1,11 @@
 import * as vscode from 'vscode';
 import { findUnusedDeclarations } from './unusedVarFunctions';
+import { updateDiagnostics, clearDiagnostics } from '../diagnosticsManager';
 
 export class UnusedVarLensProvider implements vscode.CodeLensProvider {
+    private static readonly diagnosticsName = "unusedVariale";
+    private static readonly diagnosticsMessage = "Declared variable is not used";
+
     async provideCodeLenses(document: vscode.TextDocument): Promise<vscode.CodeLens[]> {
         const codeLenses: vscode.CodeLens[] = [];
         // Only check source files, not headers
@@ -14,6 +18,13 @@ export class UnusedVarLensProvider implements vscode.CodeLensProvider {
         }
         const findings = findUnusedDeclarations(document);
 
+        if (findings.length === 0) {
+            clearDiagnostics(UnusedVarLensProvider.diagnosticsName, document);
+            return codeLenses;
+        }
+
+        const findingsSet = new Set<[string, vscode.Range]>();
+
         for (const finding of findings) {
             const line = finding.range.start.line;
             const lens = new vscode.CodeLens(finding.range, {
@@ -22,7 +33,16 @@ export class UnusedVarLensProvider implements vscode.CodeLensProvider {
                 arguments: [document.uri, line]
             });
             codeLenses.push(lens);
+
+            findingsSet.add([finding.name, finding.range]);
         }
+
+        updateDiagnostics(
+            UnusedVarLensProvider.diagnosticsName,
+            document,
+            findingsSet,
+            UnusedVarLensProvider.diagnosticsMessage,
+            vscode.DiagnosticSeverity.Error);
 
         return codeLenses;
     }
