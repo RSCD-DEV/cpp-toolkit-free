@@ -15,11 +15,11 @@ The goal is to keep your projects clean, efficient, and easier to maintain.
 
 ## Unused Variable Detection
 
-![Unused Variable Detection](images/UnusedVarDemo.gif)
+![Unused Variable Detection](https://gitlab.com/rscd-dev/cpp-toolkit/cpp-toolkit-free/-/raw/main/images/UnusedVarDemo.gif)
 
 ## Unused Include Detection
 
-![Unused Include Detection](images/UnusedIncludeDemo.gif)
+![Unused Include Detection](https://gitlab.com/rscd-dev/cpp-toolkit/cpp-toolkit-free/-/raw/main/images/UnusedIncludeDemo.gif)
 
 ---
 
@@ -50,6 +50,7 @@ If you find other issues, please open a [GitLab issue](https://gitlab.com/rscd-d
 ### 1.0.0
 - Initial release
 - Added unused variable detection
+- Added unused includes detection
 
 ---
 
@@ -59,21 +60,3 @@ This project follows the official VS Code extension development guidelines:
 * [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
 
 ---
-
-## Development
-
-If you want to run this extension locally:
-
-```bash
-# Clone repository
-git clone https://github.com/RSCD-DEV/cpp-toolkit-free.git
-cd cpp-toolkit-free
-
-# Install dependencies
-npm install
-
-# Compile TypeScript
-npm run compile
-
-# Launch VS Code extension host
-npm run watch
