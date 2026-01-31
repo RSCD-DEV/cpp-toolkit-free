@@ -1,5 +1,5 @@
 import * as assert from 'assert';
-import { extractCppSymbols } from '../unusedIncludeChecker/unusedIncludeFunctions';
+import { extractCppSymbols } from '../src/unusedIncludeChecker/unusedIncludeFunctions';
 
 
 suite('Unused Include Tests', () => {
