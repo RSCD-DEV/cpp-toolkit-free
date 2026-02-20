@@ -10,8 +10,10 @@ interface HeaderSymbols {
 
 export const repoHeaderMaps = new Map<string, Map<string, HeaderSymbols>>();
 
-export function registerUnusedIncludeChecker(context: vscode.ExtensionContext) {
+export function registerUnusedIncludeChecker(context: vscode.ExtensionContext): vscode.Disposable[] {
     console.log("Register unused include command");
+    const disposables: vscode.Disposable[] = [];
+
     const deleteUnusedVarDisposable = vscode.commands.registerCommand('cpp-toolkit.deleteUnusedInclude', (uri: vscode.Uri, line: number) => {
         const editor = vscode.window.activeTextEditor;
         if (!editor || editor.document.uri.toString() !== uri.toString()) {
@@ -23,22 +25,24 @@ export function registerUnusedIncludeChecker(context: vscode.ExtensionContext) {
             editBuilder.delete(lineRange);
         });
     });
+    disposables.push(deleteUnusedVarDisposable);
     context.subscriptions.push(deleteUnusedVarDisposable);
 
-
-    context.subscriptions.push(
-        vscode.languages.registerCodeLensProvider(
-            { language: 'cpp', scheme: 'file' },
-            new UnusedIncludeLensProvider()
-        )
+    const codeLensDisposable = vscode.languages.registerCodeLensProvider(
+        { language: 'cpp', scheme: 'file' },
+        new UnusedIncludeLensProvider()
     );
+    disposables.push(codeLensDisposable);
+    context.subscriptions.push(codeLensDisposable);
 
     vscode.workspace.workspaceFolders?.forEach(folder => {
-        indexHeadersForFolder(folder.uri.fsPath);
+        indexHeadersForFolder(folder.uri.fsPath, disposables);
     });
+
+    return disposables;
 }
 
-async function indexHeadersForFolder(rootPath: string) {
+async function indexHeadersForFolder(rootPath: string, disposables: vscode.Disposable[]) {
     const headerMap = new Map<string, HeaderSymbols>();
     repoHeaderMaps.set(rootPath, headerMap);
 
@@ -53,9 +57,11 @@ async function indexHeadersForFolder(rootPath: string) {
     }
 
     const watcher = vscode.workspace.createFileSystemWatcher(new vscode.RelativePattern(rootPath, '**/*.{h,hpp}'));
-    watcher.onDidChange(uri => updateHeader(uri, headerMap));
-    watcher.onDidCreate(uri => updateHeader(uri, headerMap));
-    watcher.onDidDelete(uri => headerMap.delete(uri.fsPath));
+    disposables.push(watcher);
+
+    disposables.push(watcher.onDidChange(uri => updateHeader(uri, headerMap)));
+    disposables.push(watcher.onDidCreate(uri => updateHeader(uri, headerMap)));
+    disposables.push(watcher.onDidDelete(uri => headerMap.delete(uri.fsPath)));
 }
 
 function updateHeader(uri: vscode.Uri, map: Map<string, HeaderSymbols>) {

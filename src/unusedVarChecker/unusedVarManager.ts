@@ -1,8 +1,10 @@
 import * as vscode from 'vscode';
 import { UnusedVarLensProvider } from './unusedVarLensProvider';
 
-export function registerUnusedVarChecker(context: vscode.ExtensionContext) {
+export function registerUnusedVarChecker(context: vscode.ExtensionContext): vscode.Disposable[] {
     console.log("Register unused var command");
+    const disposables: vscode.Disposable[] = [];
+
     const deleteUnusedVarDisposable = vscode.commands.registerCommand('cpp-toolkit.deleteUnusedVar', (uri: vscode.Uri, line: number) => {
         const editor = vscode.window.activeTextEditor;
         if (!editor || editor.document.uri.toString() !== uri.toString()) {
@@ -14,13 +16,15 @@ export function registerUnusedVarChecker(context: vscode.ExtensionContext) {
             editBuilder.delete(lineRange);
         });
     });
+    disposables.push(deleteUnusedVarDisposable);
     context.subscriptions.push(deleteUnusedVarDisposable);
 
-
-    context.subscriptions.push(
-        vscode.languages.registerCodeLensProvider(
-            { language: 'cpp', scheme: 'file' },
-            new UnusedVarLensProvider()
-        )
+    const codeLensDisposable = vscode.languages.registerCodeLensProvider(
+        { language: 'cpp', scheme: 'file' },
+        new UnusedVarLensProvider()
     );
+    disposables.push(codeLensDisposable);
+    context.subscriptions.push(codeLensDisposable);
+
+    return disposables;
 }
